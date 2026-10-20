@@ -1,0 +1,599 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: the sentence is the layout. Each chapter is one full-bleed field; a short statement on the left, its proof on the right. */
+:root{
+  color-scheme: light;
+  --mustard:#e1ac10;
+  --surface:#cd9d0f;
+  --light:#efc23e;
+  --ink:#0b0b0b;
+  --muted:#3a2e07;
+  --accent:#24338f;
+  --accent-ink:#ffffff;
+  --font:"Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-lead: clamp(1.25rem, 1.05rem + 0.9vw, 2rem);
+  --step-title: clamp(2.5rem, 1.4rem + 4.4vw, 5.25rem);
+  --step-display: clamp(4rem, 13vw, 12.5rem);
+  --gutter: clamp(16px, 2.2vw, 32px);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--mustard);color:var(--ink);font-family:var(--font);font-size:var(--step-body);line-height:1.45;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--ink)}
+a{color:inherit}
+::selection{background:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.wrap{padding-left:max(var(--gutter), env(safe-area-inset-left,0px));padding-right:max(var(--gutter), env(safe-area-inset-right,0px))}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(12px,1.6vw,24px)}
+h1,h2,h3{margin:0;font-weight:700;letter-spacing:-0.035em;line-height:0.95;text-wrap:balance}
+p{margin:0}
+.tab{font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;min-height:52px;padding:0 1.4em;border:0;border-radius:0;background:var(--accent);color:var(--accent-ink);font:500 var(--step-body)/1 var(--font);text-decoration:none;cursor:pointer;transition:transform 160ms var(--ease-out), background-color 200ms ease}
+.btn:active{transform:scale(0.97)}
+@media (hover:hover) and (pointer:fine){.btn:hover{background:#1b2873}}
+.link{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.22em;transition:text-underline-offset 200ms ease}
+@media (hover:hover) and (pointer:fine){.link:hover{text-underline-offset:.36em}}
+
+/* Header: takes the ink of the chapter beneath it */
+.top{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:50;color:var(--hdr,var(--mustard));background:var(--hdrbg,var(--ink));transition:color 300ms ease,background-color 300ms ease}
+.top .bar{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:72px}
+.mark{font-weight:700;font-size:var(--step-body);letter-spacing:-0.02em;text-decoration:none;white-space:nowrap}
+.nav{display:flex;align-items:center;gap:clamp(16px,2vw,32px)}
+.nav a.t{text-decoration:none;font-weight:500;font-size:var(--step-small)}
+@media (hover:hover) and (pointer:fine){.nav a.t:hover{text-decoration:underline;text-underline-offset:.3em}}
+.nav .btn{min-height:44px;font-size:var(--step-small)}
+.menuword{display:none}
+
+/* Hero: two fields meeting inside the headline */
+.hero{position:relative;overflow:hidden;isolation:isolate;background:var(--ink);color:var(--ink)}
+.hero-inner{position:relative;display:flex;flex-direction:column;min-height:96svh;padding-block:clamp(150px,22vh,240px) 56px}
+.h1wrap{position:relative;font-size:clamp(4rem,16.5vw,15rem);line-height:0.86;letter-spacing:-0.05em;font-weight:700;--seam:1.12em}
+.h1wrap::after{content:"";position:absolute;left:-50vw;right:-50vw;top:var(--seam);height:200vh;background:var(--mustard);z-index:-1}
+.h1{margin:0;font:inherit;letter-spacing:inherit;line-height:inherit;color:var(--mustard)}
+.h1 .ln{display:block;white-space:nowrap}
+.h1 .w{display:inline-block;mix-blend-mode:difference}
+.chip{display:inline-block;vertical-align:baseline;width:2.3em;height:0.68em;margin-left:.08em;background:var(--accent);color:var(--accent-ink);letter-spacing:-0.02em;overflow:hidden}
+.chip .in{height:100%;display:flex;flex-direction:column;justify-content:center;padding:0 .14em}
+.chip .cv{display:block;font-size:.24em;line-height:1;font-weight:700;transition:opacity 260ms ease, filter 260ms ease, transform 260ms var(--ease-out)}
+.chip .cl{display:block;font-size:max(13px,.085em);line-height:1.25;font-weight:500;letter-spacing:0;margin-top:.5em;opacity:.85;transition:opacity 260ms ease}
+.chip.swap .cv,.chip.swap .cl{opacity:0;filter:blur(2px);transform:translateY(-6px)}
+.hero-low{background:var(--mustard);display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;row-gap:32px;margin-top:clamp(40px,6vh,72px);align-items:end}
+.hero-low p{grid-column:1 / span 6;font-size:var(--step-lead);line-height:1.3;max-width:34ch;font-weight:500}
+.hero-low .acts{grid-column:8 / span 5;justify-self:end;display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center}
+.hero-low .acts a.link{font-weight:500}
+
+/* Chapter fields */
+.chapter{position:relative;padding-block:clamp(72px,8vw,120px)}
+.ch-black{background:var(--ink);color:var(--mustard)}
+.ch-mustard{background:var(--mustard);color:var(--ink)}
+.ch-surface{background:var(--surface);color:var(--ink)}
+
+/* Showcase: the headline you can type */
+.price h2{font-size:var(--step-title);grid-column:1 / span 9}
+.price .lede{grid-column:1 / span 6;margin-top:28px;color:var(--mustard);max-width:52ch}
+.typed{grid-column:1 / -1;margin-top:clamp(48px,6vw,88px);position:relative}
+.typed label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.typed input{width:100%;border:0;background:transparent;color:var(--mustard);font:700 clamp(2.1rem,5.6vw,6rem)/1.05 var(--font);letter-spacing:-0.04em;padding:0 0 .08em;caret-color:var(--accent-ink);outline:none;border-bottom:0}
+.typed input:focus-visible{outline:3px solid var(--mustard);outline-offset:8px}
+.answer{grid-column:1 / span 7;margin-top:48px}
+.examples{grid-column:9 / span 4;margin-top:48px;align-self:start;display:flex;flex-direction:column;gap:6px}
+.examples p{color:var(--mustard);font-size:var(--step-small);margin-bottom:6px}
+.examples button{all:unset;cursor:pointer;color:var(--mustard);font-size:var(--step-body);font-weight:500;padding:10px 0;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.24em;transition:text-underline-offset 200ms ease, transform 160ms var(--ease-out)}
+.examples button:active{transform:scale(0.97)}
+.examples button:focus-visible{outline:3px solid var(--mustard);outline-offset:4px}
+@media (hover:hover) and (pointer:fine){.examples button:hover{text-underline-offset:.38em}}
+
+/* Receipt: interface fragment */
+.receipt{background:var(--mustard);color:var(--ink);max-width:620px;padding:28px 28px 24px;font-size:16px}
+.receipt .rh{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-bottom:16px}
+.receipt .rh strong{font-size:20px;letter-spacing:-0.01em}
+.receipt .rh span{font-size:14px;color:var(--muted)}
+.receipt dl{margin:0;display:grid;grid-template-columns:1fr auto;row-gap:10px;column-gap:16px}
+.receipt dt{color:var(--muted)}
+.receipt dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+.receipt dt.off,.receipt dd.off{opacity:.45;text-decoration:line-through}
+.receipt .tot{margin-top:18px;padding:16px 18px;background:var(--ink);color:var(--mustard);display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:4px 16px}
+.receipt .tot b{font-size:clamp(28px,3vw,40px);letter-spacing:-0.03em;font-variant-numeric:tabular-nums}
+.receipt .tot span{font-size:14px}
+.receipt .tot .yr{grid-column:2;text-align:right;font-size:15px;font-variant-numeric:tabular-nums}
+.receipt .rate{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:16px;font-size:14px;color:var(--muted)}
+.receipt .rate input{width:5.2em;min-height:36px;padding:0 8px;border:2px solid var(--ink);border-radius:0;background:var(--light);color:var(--ink);font:500 15px var(--font);font-variant-numeric:tabular-nums}
+
+/* Switches: sentences with switches */
+.switches{padding-block:clamp(72px,8vw,120px) 0}
+.switches h2{font-size:var(--step-title);max-width:12ch}
+.switches .lede{margin-top:28px;max-width:52ch}
+.bands{margin-top:clamp(56px,7vw,96px)}
+.band{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;align-items:center;min-height:max(150px,20vh);padding-block:24px;cursor:pointer;transition:background-color 300ms ease,color 300ms ease;color:var(--muted)}
+.band .s{grid-column:1 / span 10;font-size:var(--step-lead);font-weight:500;line-height:1.2;letter-spacing:-0.015em}
+.band .c{display:block;font-size:var(--step-body);font-weight:400;line-height:1.4;letter-spacing:0;margin-top:10px;max-width:60ch;opacity:0;transform:translateY(-6px);transition:opacity 220ms ease,transform 260ms var(--ease-out)}
+.band.on .c{opacity:1;transform:none}
+.band .sw{grid-column:11 / span 2;justify-self:end}
+.band.on{color:var(--ink)}
+.band.on[data-c="black"]{background:var(--ink);color:var(--mustard)}
+.band.on[data-c="blue"]{background:var(--accent);color:var(--accent-ink)}
+.band.on[data-c="surface"]{background:var(--surface)}
+.band.on[data-c="light"]{background:var(--light)}
+.toggle{all:unset;box-sizing:border-box;position:relative;width:72px;height:40px;border-radius:999px;background:var(--surface);cursor:pointer;transition:background-color 220ms ease,transform 160ms var(--ease-out)}
+.toggle::after{content:"";position:absolute;top:5px;left:5px;width:30px;height:30px;border-radius:50%;background:var(--ink);transition:transform 240ms var(--ease-out),background-color 220ms ease}
+.toggle[aria-checked="true"]{background:currentColor}
+.band.on[data-c="black"] .toggle::after,.band.on[data-c="blue"] .toggle::after{background:var(--ink)}
+.band.on[data-c="blue"] .toggle::after{background:var(--accent)}
+.band.on[data-c="black"] .toggle::after{background:var(--ink)}
+.toggle[aria-checked="true"]::after{transform:translateX(32px)}
+.toggle:active{transform:scale(0.96)}
+.toggle:focus-visible{outline:3px solid currentColor;outline-offset:4px}
+
+/* List: statement, table pushed right */
+.guides h2{font-size:var(--step-title);text-indent:3vw;max-width:14ch}
+.guides .body{margin-top:96px;align-items:end}
+.fig{grid-column:1 / span 5;align-self:end}
+.tname{grid-column:7 / span 1;font-size:var(--step-small);align-self:start;padding-top:4px;color:var(--muted)}
+.rows{grid-column:8 / span 5;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.rows li.g{margin-top:38px}
+.rows a{display:grid;grid-template-columns:30% 1fr auto;gap:12px;align-items:baseline;padding:10px 0;text-decoration:none;font-size:16px;transition:transform 200ms var(--ease-out)}
+.rows a .k{color:var(--muted)}
+.rows a .n{font-weight:500}
+.rows a .ar{transition:transform 200ms var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.rows a:hover .n{text-decoration:underline;text-underline-offset:.25em}.rows a:hover .ar{transform:translateX(4px)}}
+
+/* Comparison fragment */
+.cmp{background:var(--ink);color:var(--mustard);padding:28px;aspect-ratio:4/5;max-width:100%;display:flex;flex-direction:column}
+.cmp h3{font-size:22px;letter-spacing:-0.01em;line-height:1.2}
+.cmp .sub{font-size:14px;margin-top:6px;opacity:.8}
+.cmp .bars{margin-top:auto;display:flex;flex-direction:column;gap:22px}
+.cmp .row .lab{display:flex;justify-content:space-between;font-size:15px;gap:12px}
+.cmp .row .lab b{font-variant-numeric:tabular-nums}
+.cmp .track{height:18px;margin-top:8px;background:#2a2410}
+.cmp .fill{height:100%;background:var(--mustard);transform-origin:left;transition:transform 400ms var(--ease-out)}
+.cmp .row.hot .fill{background:var(--light)}
+.cmp .cmpnote{margin-top:24px;font-size:14px;opacity:.8}
+
+/* Live bill beside the switches heading */
+.swhead{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;align-items:end}
+.swhead > div:first-child{grid-column:1 / span 7}
+.mini{grid-column:9 / span 4;background:var(--ink);color:var(--mustard);padding:24px}
+.mini .mh{display:flex;justify-content:space-between;gap:12px;font-size:15px}
+.mini .mt{font-size:var(--step-title);font-weight:700;letter-spacing:-0.04em;line-height:1;margin-top:18px}
+.mini .mf{font-size:15px;margin-top:8px}
+.mini .mtags{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.mini .mtags li{font-size:14px;padding:6px 10px;background:#262009;border-radius:999px}
+/* Checkout fragment in the FAQ */
+.co{grid-column:1 / span 3;margin-top:80px;align-self:start;background:var(--light);padding:20px;font-size:15px}
+.co .coh{font-weight:700;font-size:16px;margin-bottom:14px}
+.co .cor{display:flex;justify-content:space-between;gap:12px;padding:6px 0}
+.co .cor.tot{font-weight:700;margin-top:6px;padding-top:12px}
+.co .cof{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.co .cof .lab{font-size:14px;color:var(--muted)}
+.co .fld{display:block;background:#fff8e1;border:2px solid var(--ink);padding:8px 10px;font-variant-numeric:tabular-nums}
+.co .con{margin-top:12px;font-size:14px;color:var(--muted)}
+/* FAQ */
+.faq h2{font-size:var(--step-title);max-width:13ch}
+.qs{grid-column:5 / span 8;margin-top:80px;display:flex;flex-direction:column;gap:12px}
+.qs details{padding:20px 24px;margin-inline:-24px;transition:background-color 220ms ease}
+.qs details[open]{background:var(--surface)}
+.qs summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:24px;font-size:var(--step-lead);line-height:1.25;letter-spacing:-0.01em}
+.qs summary::-webkit-details-marker{display:none}
+.qs summary .chev{flex:none;width:14px;height:14px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(45deg) translateY(-3px);transition:transform 240ms var(--ease-out)}
+.qs details[open] .chev{transform:rotate(225deg) translateY(-3px)}
+.qs .a{margin-top:16px;max-width:52ch;font-size:var(--step-body)}
+.qs .a a{font-weight:500}
+
+/* CTA inverted */
+.cta{background:var(--ink);color:var(--mustard);min-height:80svh;display:flex;flex-direction:column;padding-block:clamp(96px,10vw,160px) 40px}
+.cta h2{font-size:clamp(3.5rem,10vw,10rem);line-height:0.9;letter-spacing:-0.045em}
+.cta h2 span{display:block;white-space:nowrap}
+.cta .base{margin-top:auto;padding-top:72px;display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap}
+.cta .base p{font-size:var(--step-lead);max-width:30ch;line-height:1.3;font-weight:500}
+.cta .btn{min-height:56px}
+
+/* Footer: the address as the headline */
+.foot{background:var(--accent);color:var(--accent-ink);min-height:90svh;display:flex;flex-direction:column;padding-block:40px 32px}
+.foot .notes{display:flex;justify-content:space-between;gap:32px;align-items:flex-start}
+.foot .notes div{display:grid;grid-template-columns:repeat(2,minmax(0,22ch));gap:8px 48px;font-size:15px}
+.foot .notes strong{font-weight:700}
+.foot h2{margin-top:auto;padding-top:96px;font-size:clamp(2.6rem,9.4vw,10rem);line-height:0.9;letter-spacing:-0.045em}
+.foot h2 a{text-decoration:none;display:inline-block;transition:transform 300ms var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.foot h2 a:hover{transform:translateX(12px)}}
+.foot .meta{margin-top:40px;display:grid;grid-template-columns:1fr auto 1fr;gap:16px 32px;font-size:14px;align-items:end}
+.foot .meta nav{display:flex;flex-wrap:wrap;gap:6px 18px}
+.foot .meta nav a{text-decoration:none}
+@media (hover:hover) and (pointer:fine){.foot .meta nav a:hover{text-decoration:underline}}
+.foot .meta .r{text-align:right}
+
+/* Entrances: content is visible at rest; motion only plays on top */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{transition-duration:1ms!important;animation:none!important;scroll-behavior:auto!important}
+}
+
+/* Tablet */
+@media (max-width: 1000px){
+  .hero-low p{grid-column:1 / -1}
+  .hero-low .acts{grid-column:1 / -1;justify-self:start}
+  .answer{grid-column:1 / -1}
+  .examples{grid-column:1 / -1;flex-direction:row;flex-wrap:wrap;gap:10px;margin-top:32px}
+  .examples p{width:100%}
+  .fig{grid-column:1 / -1;order:2;max-width:420px;margin-top:64px;justify-self:end;width:70%}
+  .tname{display:none}
+  .rows{grid-column:1 / -1}
+  .qs{grid-column:1 / -1}
+  .cta,.foot{min-height:0}
+  .foot h2{padding-top:120px}
+  .swhead > div:first-child,.mini{grid-column:1 / -1}
+  .mini{margin-top:40px;max-width:420px}
+  .co{grid-column:1 / -1;max-width:360px;order:3;margin-top:48px}
+  .qs details{margin-inline:0}
+}
+/* Phone */
+@media (max-width: 640px){
+  .nav a.t{display:none}
+  .menuword{display:inline;font-weight:500;font-size:var(--step-small);text-decoration:none}
+  .nav .btn{padding:0 1em}
+  .h1wrap{font-size:18vw}
+  .hero-inner{min-height:0;padding-block:136px 64px}
+  .hero-low p{font-size:17px}
+  .price h2,.switches h2,.guides h2,.faq h2{font-size:clamp(2.2rem,10vw,3rem)}
+  .guides h2{text-indent:0}
+  .typed input{font-size:9vw}
+  .examples button{background:var(--surface);color:var(--ink);text-decoration:none;padding:12px 14px;min-height:44px;box-sizing:border-box;font-size:15px}
+  .receipt{padding:20px 18px}
+  .band{min-height:132px}
+  .band .s{grid-column:1 / span 9;font-size:20px}
+  .band .c{font-size:15px}
+  .band .sw{grid-column:10 / span 3}
+  .toggle{width:64px;height:38px}
+  .toggle::after{width:28px;height:28px}
+  .toggle[aria-checked="true"]::after{transform:translateX(26px)}
+  .fig{width:86%}
+  .rows a{grid-template-columns:1fr auto;row-gap:2px}
+  .rows a .k{grid-column:1 / -1}
+  .qs details{margin-inline:calc(-1 * max(16px, env(safe-area-inset-left,0px)));padding-inline:max(16px, env(safe-area-inset-left,0px))}
+  .qs summary{font-size:19px}
+  .cta{min-height:80svh}
+  .cta h2{font-size:12vw}
+  .cta .btn{width:100%}
+  .foot .notes{flex-direction:column}
+  .foot .notes div{grid-template-columns:1fr}
+  .foot h2{font-size:12.4vw}
+  .foot .meta{grid-template-columns:1fr;font-size:13px}
+  .foot .meta .r{text-align:left}
+}
+
+/* WordPress / Elementor guard: keep theme styles from leaking into this page */
+.sdt-home, .sdt-home *{font-family:var(--font)}
+.sdt-home h1,.sdt-home h2,.sdt-home h3{color:inherit;text-transform:none;margin:0}
+.sdt-home a{color:inherit;box-shadow:none}
+.sdt-home button{text-transform:none;letter-spacing:inherit;box-shadow:none}
+.sdt-home .btn,.sdt-home .btn:visited{color:var(--accent-ink)}
+.sdt-home ul{margin:0}
+.elementor-widget-html:has(.sdt-home){width:100%}
+</style>
+<div class="sdt-home">
+
+
+<header class="top wrap" id="top">
+  <div class="bar">
+    <a class="mark" href="https://smartdigitaltools.com.au/">Smart Digital Tools</a>
+    <nav class="nav" aria-label="Main">
+      <a class="t" href="https://smartdigitaltools.com.au/review/">Reviews</a>
+      <a class="t" href="https://smartdigitaltools.com.au/compare/">Compare</a>
+      <a class="t" href="https://smartdigitaltools.com.au/best-of/">Best of</a>
+      <a class="t" href="https://smartdigitaltools.com.au/blog/">Blog</a>
+      <a class="menuword" href="#guides">Menu</a>
+      <a class="btn" href="https://smartdigitaltools.com.au/directory/">Explore AI tools</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero" data-ink="mustard" aria-labelledby="h1">
+    <div class="hero-inner wrap">
+      <div class="h1wrap">
+        <h1 class="h1" id="h1"><span class="ln"><span class="w">AI tools,</span></span><span class="ln"><span class="w">in</span> <span class="chip" data-ui aria-hidden="true"><span class="in"><span class="cv">A$45.62</span><span class="cl">HeyGen Creator</span></span></span><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Australian dollars</span></span></h1>
+      </div>
+      <div class="hero-low">
+        <p>Independent reviews and comparisons of AI tools for Australian small businesses, freelancers and creators, with every price worked out the way you will pay it.</p>
+        <div class="acts">
+          <a class="link" href="#price">Work out a price</a>
+          <a class="btn" href="https://smartdigitaltools.com.au/directory/">Explore the directory</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter ch-black price" id="price" data-ink="mustard" aria-labelledby="price-h">
+    <div class="wrap grid">
+      <h2 id="price-h">What will it really cost?</h2>
+      <p class="lede">Most AI tools are billed in US dollars. Type a plan and its sticker price, and see the bill in Australian dollars, with GST and the usual extras added.</p>
+      <div class="typed" data-ui>
+        <label for="q">A plan and its price</label>
+        <input id="q" type="text" value="HeyGen Creator, US$29 a month" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="answer">
+        <div class="receipt" data-ui id="receipt" aria-live="polite">
+          <div class="rh"><strong id="r-name">HeyGen Creator</strong><span id="r-term">Billed monthly</span></div>
+          <dl>
+            <dt>Sticker price</dt><dd id="r-usd">US$29.00</dd>
+            <dt id="r-seat-l">Seats</dt><dd id="r-seat">1</dd>
+            <dt>In Australian dollars</dt><dd id="r-aud">A$41.47</dd>
+            <dt id="r-gst-l">GST at 10%</dt><dd id="r-gst">A$4.15</dd>
+            <dt id="r-fee-l">Card overseas fee at 3%</dt><dd id="r-fee">A$1.37</dd>
+          </dl>
+          <div class="tot"><span>Each month</span><b id="r-tot">A$46.99</b><span class="yr" id="r-yr">A$563.88 a year</span></div>
+          <div class="rate"><label for="rate">US$1 =</label><span>A$</span><input id="rate" type="number" step="0.01" min="0.5" max="3" value="1.43"><span>Rate on 21 October 2026. Use your bank's rate.</span></div>
+        </div>
+      </div>
+      <div class="examples">
+        <p>Try another plan</p>
+        <button type="button" data-q="Runway Standard, US$15 a month">Runway Standard, US$15</button>
+        <button type="button" data-q="Higgsfield Plus, US$59 a month">Higgsfield Plus, US$59</button>
+        <button type="button" data-q="HeyGen Business, 3 seats">HeyGen Business, 3 seats</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="ch-mustard switches" id="switches" data-ink="ink" aria-labelledby="sw-h">
+    <div class="wrap">
+      <div class="swhead">
+        <div>
+          <h2 id="sw-h">Your situation changes the bill</h2>
+          <p class="lede">Four things decide what an Australian buyer actually pays. Switch them to match your business; the bill follows.</p>
+        </div>
+        <div class="mini" data-ui aria-live="polite">
+          <p class="mh"><span id="m-name">HeyGen Creator</span><span id="m-term">Monthly</span></p>
+          <p class="mt tab" id="m-tot">A$46.99</p>
+          <p class="mf">a month, as charged to your card</p>
+          <ul class="mtags" id="m-tags"></ul>
+        </div>
+      </div>
+    </div>
+    <div class="bands" role="group" aria-label="Your situation">
+      <div class="band wrap on" data-c="black" data-k="gst">
+        <p class="s">GST is added at checkout<span class="c" id="c-gst"></span></p>
+        <div class="sw"><button class="toggle" role="switch" aria-checked="true" aria-label="GST is added at checkout"></button></div>
+      </div>
+      <div class="band wrap on" data-c="blue" data-k="fee">
+        <p class="s">My card charges an overseas fee<span class="c" id="c-fee"></span></p>
+        <div class="sw"><button class="toggle" role="switch" aria-checked="true" aria-label="My card charges an overseas fee"></button></div>
+      </div>
+      <div class="band wrap" data-c="surface" data-k="annual">
+        <p class="s">I will pay for a year up front<span class="c" id="c-annual"></span></p>
+        <div class="sw"><button class="toggle" role="switch" aria-checked="false" aria-label="I will pay for a year up front"></button></div>
+      </div>
+      <div class="band wrap" data-c="light" data-k="seats">
+        <p class="s">Two more people need their own login<span class="c" id="c-seats"></span></p>
+        <div class="sw"><button class="toggle" role="switch" aria-checked="false" aria-label="Two more people need their own login"></button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter ch-surface guides" id="guides" data-ink="ink" aria-labelledby="g-h">
+    <div class="wrap">
+      <h2 id="g-h">Start with the work you need to finish</h2>
+      <div class="grid body">
+        <figure class="fig" style="margin:0">
+          <div class="cmp" data-ui role="img" aria-label="Monthly cost in Australian dollars with GST: Runway Standard, HeyGen Creator and Higgsfield Plus">
+            <h3>Three video tools, one month</h3>
+            <p class="sub">Entry paid plans, billed monthly, GST included</p>
+            <div class="bars" id="bars"></div>
+            <p class="cmpnote">From our side-by-side video comparison</p>
+          </div>
+        </figure>
+        <p class="tname">Guides</p>
+        <ul class="rows">
+          <li><a href="https://smartdigitaltools.com.au/writing-content/"><span class="k">Writing</span><span class="n">Emails, product copy and drafts</span><span class="ar">→</span></a></li>
+          <li><a href="https://smartdigitaltools.com.au/image-generation/"><span class="k">Images</span><span class="n">Visual concepts and marketing assets</span><span class="ar">→</span></a></li>
+          <li><a href="https://smartdigitaltools.com.au/video-avatars/"><span class="k">Video</span><span class="n">Presenters, avatars and translation</span><span class="ar">→</span></a></li>
+          <li><a href="https://smartdigitaltools.com.au/automation-category/"><span class="k">Automation</span><span class="n">Workflows worth connecting</span><span class="ar">→</span></a></li>
+          <li class="g"><a href="https://smartdigitaltools.com.au/higgsfield-review/"><span class="k">Review</span><span class="n">Is Higgsfield right for you?</span><span class="ar">→</span></a></li>
+          <li><a href="https://smartdigitaltools.com.au/higgsfield-vs-runway-luma-heygen/"><span class="k">Compare</span><span class="n">Higgsfield, Runway, Luma, HeyGen</span><span class="ar">→</span></a></li>
+          <li><a href="https://smartdigitaltools.com.au/higgsfield-cinema-studio-tutorial/"><span class="k">Tutorial</span><span class="n">A first Cinema Studio shot</span><span class="ar">→</span></a></li>
+          <li><a href="https://smartdigitaltools.com.au/higgsfield-credits-budget-accepted-shots/"><span class="k">Budget</span><span class="n">Credits per accepted shot</span><span class="ar">→</span></a></li>
+          <li class="g"><a href="https://smartdigitaltools.com.au/best-of/"><span class="k">Shortlists</span><span class="n">Buying guides by task</span><span class="ar">→</span></a></li>
+          <li><a href="https://smartdigitaltools.com.au/compare/"><span class="k">Head to head</span><span class="n">Two tools, side by side</span><span class="ar">→</span></a></li>
+          <li><a href="https://smartdigitaltools.com.au/review/"><span class="k">Reviews</span><span class="n">One subscription, checked</span><span class="ar">→</span></a></li>
+          <li><a href="https://smartdigitaltools.com.au/costs-blog/"><span class="k">Costs</span><span class="n">Budgeting for AI software</span><span class="ar">→</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter ch-mustard faq" id="faq" data-ink="ink" aria-labelledby="f-h">
+    <div class="wrap grid">
+      <h2 id="f-h" style="grid-column:1 / -1">Questions before you subscribe</h2>
+      <div class="co" data-ui aria-hidden="true">
+        <p class="coh">Checkout</p>
+        <div class="cor"><span>Creator plan, monthly</span><span class="tab">A$41.47</span></div>
+        <div class="cof"><span class="lab">ABN (optional)</span><span class="fld">12 345 678 901</span></div>
+        <div class="cor"><span>GST</span><span class="tab">A$0.00</span></div>
+        <div class="cor tot"><span>Total today</span><span class="tab">A$41.47</span></div>
+        <p class="con">A business ABN at checkout. Example figures.</p>
+      </div>
+      <div class="qs">
+        <details open><summary>Do overseas AI tools charge GST?<span class="chev" aria-hidden="true"></span></summary><p class="a">Overseas providers that sell digital services to Australian consumers are expected to add 10% GST. A GST-registered business buying for business use generally is not charged it, so check whether the checkout asks for your ABN.</p></details>
+        <details><summary>Why did my bill change when the plan didn't?<span class="chev" aria-hidden="true"></span></summary><p class="a">A plan priced in US dollars is converted each time you are charged. When the Australian dollar moves, so does your bill, and some cards add an overseas transaction fee on top.</p></details>
+        <details><summary>Monthly or annual billing?<span class="chev" aria-hidden="true"></span></summary><p class="a">Annual billing usually lowers the monthly rate, but you pay for the year at once and lock in that exchange rate. Run a monthly trial on real work first, then decide.</p></details>
+        <details><summary>Can AI tools help a small business?<span class="chev" aria-hidden="true"></span></summary><p class="a">They can help with defined parts of a workflow, such as drafting from approved notes, exploring visual ideas or editing a recording. Start with one recurring task, and compare the useful result with the setup, checking and ongoing costs.</p></details>
+        <details><summary>Should I choose a free or paid plan?<span class="chev" aria-hidden="true"></span></summary><p class="a">Start with the features and usage you need. A free plan may be enough for occasional work; a paid plan is worth it when a specific limit stops you finishing a useful recurring task.</p></details>
+        <details><summary>Does Smart Digital Tools sell these subscriptions?<span class="chev" aria-hidden="true"></span></summary><p class="a">No. Subscriptions are bought from the providers. Some outbound links are affiliate links, and our <a class="link" href="https://smartdigitaltools.com.au/affiliate-disclosure/">affiliate disclosure</a> explains how they work.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta wrap" data-ink="mustard" aria-labelledby="cta-h">
+    <h2 id="cta-h"><span>Price it first,</span><span>then subscribe</span></h2>
+    <div class="base">
+      <p>Browse the directory, or compare two tools side by side before you commit to a plan.</p>
+      <a class="btn" href="https://smartdigitaltools.com.au/directory/">Explore the directory</a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot wrap" data-ink="white" aria-labelledby="ft-h">
+  <div class="notes">
+    <div>
+      <p><strong>Smart Digital Tools</strong><br>Independent AI tool guides for Australian businesses.</p>
+      <p>Some links are affiliate links. If you buy through them we may earn a commission, at no extra cost to you.</p>
+    </div>
+    <a class="link" href="#top">Back to top</a>
+  </div>
+  <h2 id="ft-h"><a href="https://smartdigitaltools.com.au/contact/">smartdigitaltools<br>.com.au</a></h2>
+  <div class="meta">
+    <nav aria-label="Footer">
+      <a href="https://smartdigitaltools.com.au/review/">Reviews</a>
+      <a href="https://smartdigitaltools.com.au/compare/">Comparisons</a>
+      <a href="https://smartdigitaltools.com.au/categories/">Categories</a>
+      <a href="https://smartdigitaltools.com.au/directory/">Directory</a>
+      <a href="https://smartdigitaltools.com.au/about-us/">About us</a>
+      <a href="https://smartdigitaltools.com.au/contact/">Contact</a>
+      <a href="https://smartdigitaltools.com.au/privacy-policy/">Privacy</a>
+      <a href="https://smartdigitaltools.com.au/terms-and-conditions/">Terms</a>
+      <a href="https://smartdigitaltools.com.au/affiliate-disclosure/">Affiliate disclosure</a>
+    </nav>
+    <p>Prices checked October 2026</p>
+    <p class="r">Australia, 2026</p>
+  </div>
+</footer>
+
+</div>
+<script>
+(function(){
+  // Plans: monthly USD and annual-billed monthly USD (checked Oct 2026). Business adds a price per extra seat.
+  var PLANS=[
+    {k:/heygen\s*business/i,n:"HeyGen Business",m:149,y:null,seat:20},
+    {k:/heygen\s*pro/i,n:"HeyGen Pro",m:49,y:null},
+    {k:/heygen/i,n:"HeyGen Creator",m:29,y:24},
+    {k:/runway\s*pro/i,n:"Runway Pro",m:35,y:28},
+    {k:/runway\s*max/i,n:"Runway Max",m:95,y:76},
+    {k:/runway/i,n:"Runway Standard",m:15,y:12},
+    {k:/higgsfield\s*ultra/i,n:"Higgsfield Ultra",m:129,y:99},
+    {k:/higgsfield/i,n:"Higgsfield Plus",m:59,y:47}
+  ];
+  var S={gst:true,fee:true,annual:false,seats:false,rate:1.43};
+  var $=function(id){return document.getElementById(id)};
+  var q=$("q"), rate=$("rate");
+  var money=function(v){return "A$"+v.toLocaleString("en-AU",{minimumFractionDigits:2,maximumFractionDigits:2})};
+  var usd=function(v){return "US$"+v.toLocaleString("en-AU",{minimumFractionDigits:2,maximumFractionDigits:2})};
+  var r2=function(v){return Math.round(v*100)/100};
+
+  function parse(text){
+    var plan=null;for(var i=0;i<PLANS.length;i++){if(PLANS[i].k.test(text)){plan=PLANS[i];break}}
+    var seatM=text.match(/(\d+)\s*(seats?|people|users?|logins?)/i);
+    var priceM=text.replace(/(\d+)\s*(seats?|people|users?|logins?)/ig,"").match(/\$?\s*(\d+(?:\.\d{1,2})?)/);
+    var seats=seatM?Math.max(1,Math.min(99,parseInt(seatM[1],10))):1;
+    var name=plan?plan.n:(text.split(/[,$]/)[0].trim()||"Your plan");
+    var m=priceM?parseFloat(priceM[1]):(plan?plan.m:0);
+    if(plan && priceM && Math.abs(m-plan.m)>0.001 && !(plan.y && Math.abs(m-plan.y)<0.001)) plan=Object.assign({},plan,{m:m,y:null});
+    return {name:name,plan:plan,m:plan?plan.m:m,seats:seats};
+  }
+  function bill(p,o){
+    o=o||S;
+    var seats=p.seats+(o.seats?2:0);
+    var annualOK=!!(p.plan&&p.plan.y);
+    var per=(o.annual&&annualOK)?p.plan.y:p.m;
+    var usdTotal;
+    if(p.plan&&p.plan.seat){usdTotal=per+p.plan.seat*(seats-1)}else{usdTotal=per*seats}
+    var aud=r2(usdTotal*o.rate);
+    var gst=o.gst?r2(aud*0.1):0;
+    var fee=o.fee?r2((aud+gst)*0.03):0;
+    var tot=r2(aud+gst+fee);
+    return {seats:seats,per:per,usd:usdTotal,aud:aud,gst:gst,fee:fee,tot:tot,annualOK:annualOK,annual:o.annual&&annualOK};
+  }
+  function render(){
+    var p=parse(q.value), b=bill(p);
+    $("r-name").textContent=p.name;
+    $("r-term").textContent=b.annual?"Billed yearly, shown per month":(S.annual&&!b.annualOK?"No yearly price listed, billed monthly":"Billed monthly");
+    $("r-usd").textContent=usd(b.usd)+(b.seats>1?"":"");
+    $("r-seat").textContent=b.seats;
+    $("r-aud").textContent=money(b.aud);
+    $("r-gst").textContent=S.gst?money(b.gst):"Not charged";
+    $("r-fee").textContent=S.fee?money(b.fee):"None";
+    ["r-gst-l","r-gst"].forEach(function(id){$(id).classList.toggle("off",!S.gst)});
+    ["r-fee-l","r-fee"].forEach(function(id){$(id).classList.toggle("off",!S.fee)});
+    $("r-tot").textContent=money(b.tot);
+    $("r-yr").textContent=money(r2(b.tot*12))+" a year";
+    // consequences, worked from the same plan
+    var gOn=bill(p,Object.assign({},S,{gst:true})), gOff=bill(p,Object.assign({},S,{gst:false}));
+    $("c-gst").textContent="10% on the converted price adds "+money(r2(gOn.tot-gOff.tot))+" a month on "+p.name+". A GST-registered business that gives its ABN usually isn't charged it.";
+    var fOn=bill(p,Object.assign({},S,{fee:true})), fOff=bill(p,Object.assign({},S,{fee:false}));
+    $("c-fee").textContent="A 3% fee adds "+money(r2(fOn.tot-fOff.tot))+" a month. Some cards charge nothing for overseas purchases; check yours.";
+    var aOn=bill(p,Object.assign({},S,{annual:true})), aOff=bill(p,Object.assign({},S,{annual:false}));
+    $("c-annual").textContent=aOn.annualOK?("The rate drops from US$"+aOff.per+" to US$"+aOn.per+" a month, paid as one charge of "+money(r2(aOn.tot*12))+"."):(p.name+" has no yearly price we have checked, so the bill stays monthly.");
+    var sOn=bill(p,Object.assign({},S,{seats:true})), sOff=bill(p,Object.assign({},S,{seats:false}));
+    $("c-seats").textContent="Two extra seats add "+money(r2(sOn.tot-sOff.tot))+" a month, bringing "+p.name+" to "+money(sOn.tot)+".";
+    $("m-name").textContent=p.name;$("m-term").textContent=b.annual?"Yearly":"Monthly";$("m-tot").textContent=money(b.tot);
+    var tags=[];if(S.gst)tags.push("GST added");else tags.push("No GST");if(S.fee)tags.push("3% card fee");if(b.annual)tags.push("Paid yearly");tags.push(b.seats+(b.seats>1?" seats":" seat"));
+    $("m-tags").innerHTML=tags.map(function(t){return "<li>"+t+"</li>"}).join("");
+    bars();
+  }
+  function bars(){
+    var o={gst:true,fee:false,annual:false,seats:false,rate:S.rate};
+    var list=[["Runway Standard",15],["HeyGen Creator",29],["Higgsfield Plus",59]].map(function(x){return {n:x[0],v:r2(r2(x[1]*o.rate)*1.1)}});
+    var max=list[list.length-1].v, cur=parse(q.value).name, el=$("bars");
+    if(!el.children.length){el.innerHTML=list.map(function(x){return '<div class="row"><div class="lab"><span></span><b></b></div><div class="track"><div class="fill"></div></div></div>'}).join("")}
+    list.forEach(function(x,i){var row=el.children[i];row.classList.toggle("hot",x.n===cur);row.querySelector("span").textContent=x.n;row.querySelector("b").textContent=money(x.v);row.querySelector(".fill").style.transform="scaleX("+(x.v/max)+")"});
+  }
+
+  q.addEventListener("input",render);
+  rate.addEventListener("input",function(){var v=parseFloat(rate.value);if(v>0.3&&v<5){S.rate=v;render();chipTick(true)}});
+  document.querySelectorAll(".examples button").forEach(function(b){b.addEventListener("click",function(){q.value=b.dataset.q;render();q.focus();q.setSelectionRange(q.value.length,q.value.length)})});
+  document.querySelectorAll(".band").forEach(function(band){
+    var t=band.querySelector(".toggle"), k=band.dataset.k;
+    function set(v){S[k]=v;band.classList.toggle("on",v);t.setAttribute("aria-checked",v?"true":"false");render();hdrInk()}
+    band.addEventListener("click",function(e){if(e.target.closest(".toggle"))return;set(!S[k])});
+    t.addEventListener("click",function(){set(!S[k])});
+  });
+
+  // Hero chip: cycles the real GST-inclusive monthly price of three plans
+  var chips=document.querySelectorAll(".chip"), ci=0;
+  var CH=[["HeyGen Creator",29],["Runway Standard a month",15],["Higgsfield Plus a month",59]];
+  function chipTick(now){
+    var c=CH[ci], v=money(r2(r2(c[1]*S.rate)*1.1));
+    var apply=function(){chips.forEach(function(ch){ch.querySelector(".cv").textContent=v;ch.querySelector(".cl").textContent=c[0]})};
+    if(now){apply();return}
+    chips.forEach(function(ch){ch.classList.add("swap")});
+    setTimeout(function(){apply();chips.forEach(function(ch){ch.classList.remove("swap")})},260);
+  }
+  var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  setInterval(function(){ci=(ci+1)%CH.length;chipTick(reduce)},2800);
+
+  // Header takes the ink of the chapter beneath it
+  var INK={mustard:"var(--mustard)",ink:"var(--ink)",white:"var(--accent-ink)"};
+  var hdr=document.querySelector(".top");
+  var secs=[].slice.call(document.querySelectorAll("[data-ink]"));
+  function hdrInk(){
+    var y=40, pick=null;
+    secs.forEach(function(s){var r=s.getBoundingClientRect();if(r.top<=y&&r.bottom>y)pick=s});
+    document.querySelectorAll(".band").forEach(function(b){var r=b.getBoundingClientRect();if(r.top<=y&&r.bottom>y)pick=b});
+    if(pick){var ink=pick.dataset.ink||"ink";
+      if(pick.classList.contains("band")){var c=pick.dataset.c,on=pick.classList.contains("on");ink=!on?"ink":(c==="black"?"mustard":c==="blue"?"white":"ink")}
+      if(pick.classList.contains("hero")){var seamEl=document.querySelector(".h1wrap"),sr=seamEl.getBoundingClientRect(),fs=parseFloat(getComputedStyle(seamEl).fontSize);ink=(sr.top+1.16*fs>y)?"mustard":"ink"}
+      hdr.style.setProperty("--hdr",INK[ink]);
+      var bg=getComputedStyle(pick).backgroundColor;
+      if(pick.classList.contains("hero")) bg=(ink==="mustard")?getComputedStyle(document.documentElement).getPropertyValue("--ink"):getComputedStyle(document.documentElement).getPropertyValue("--mustard");
+      if(!bg||bg==="rgba(0, 0, 0, 0)") bg=getComputedStyle(document.body).backgroundColor;
+      hdr.style.setProperty("--hdrbg",bg);
+      hdr.querySelector(".btn").style.background=(ink==="white")?"var(--ink)":"";
+    }
+  }
+  addEventListener("scroll",hdrInk,{passive:true});addEventListener("resize",hdrInk);
+
+  // Entrances: heading, then text, then the figure. Content stays visible if this never runs.
+  if(!reduce && "IntersectionObserver" in window && Element.prototype.animate){
+    var groups=document.querySelectorAll(".chapter, .switches, .cta, .foot");
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;io.unobserve(e.target);
+      var parts=e.target.querySelectorAll("h2, .lede, .typed, .receipt, .examples, .band, .fig, .rows li, .qs details, .base, .notes, .meta");
+      parts.forEach(function(el,i){el.animate([{opacity:0,transform:"translateY(24px)"},{opacity:1,transform:"none"}],{duration:620,delay:Math.min(i,10)*70,easing:"cubic-bezier(0.23,1,0.32,1)",fill:"backwards"})});
+    })},{rootMargin:"0px 0px -12% 0px"});
+    groups.forEach(function(g){var r=g.getBoundingClientRect();if(r.top>innerHeight)io.observe(g)});
+    // Hero load sequence
+    document.querySelectorAll(".h1 .w, .h1 .chip, .hero-low > *").forEach(function(el,i){el.animate([{opacity:0,transform:"translateY(32px)"},{opacity:1,transform:"none"}],{duration:800,delay:120+i*90,easing:"cubic-bezier(0.23,1,0.32,1)",fill:"backwards"})});
+  }
+  render();hdrInk();
+})();
+</script>
